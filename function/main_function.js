@@ -1,4 +1,4 @@
-const { request_api,user_database,set_date,set_time,check_api } = require("./api_functionjs");
+const { request_api,user_database,set_date,set_time,check_api } = require("./api_function.js");
 const { set_app } = require("./web_function");
 const express = require('express');
 const { createServer } = require('http');
@@ -12,7 +12,7 @@ const run_server = function(){
 }
 
 //API에 데이터를 지속적으로 요청함//
-const run_api = function(connection){
+const run_api = function(){
     const connection = user_database();
     let base_date = set_date();
     let base_time = set_time();

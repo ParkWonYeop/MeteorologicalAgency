@@ -1,5 +1,5 @@
 let express = require('express');
-const mysql_function = require("../function/api_functionjs");
+const mysql_function = require("../function/api_function.js");
 let router = express.Router();
 
 router.get('/main', function (req, res) {
