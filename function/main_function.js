@@ -12,8 +12,7 @@ const run_server = function(){
 }
 
 //API에 데이터를 지속적으로 요청함//
-const run_api = function(){
-    const connection = user_database();
+const run_api = function(connection){
     let base_date = set_date();
     let base_time = set_time();
     request_api(connection,base_date,base_time);
