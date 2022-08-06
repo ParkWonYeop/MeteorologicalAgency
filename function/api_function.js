@@ -32,15 +32,13 @@ const request_api = async function(connection,base_date,base_time){
     await connection.query(`SELECT area_code FROM local_information`,async function(err, result){
         if(err){
             console.log('데이터베이스 오류');
-        }
-        else{
-            for (let data of result){
-                area_code.push(data.area_code);
-            };
-            for(let num in area_code){
-                await request_body(connection,area_code[num],base_date,base_time);
-            }
             return 0;
+        }
+        for (let data of result){
+            area_code.push(data.area_code);
+        };
+        for(let num in area_code){
+            await request_body(connection,area_code[num],base_date,base_time);
         }
     });
     return 0;
@@ -51,16 +49,14 @@ const check_error = async function(connection){
     await connection.query('SELECT area_code,date,time FROM weather_information where PTY = -100 OR PTY = -101', async function(err, result){
         if(err){
             console.log('데이터베이스 오류');
+            return 0;
         }
-        else{
-            for (let data of result){
-                await delete_error(connection)
-                if(data.time != undefined){
-                    await request_body(connection,data.area_code,data.date,data.time);
-                }
-            };
-        }
-        return 0;
+        for (let data of result){
+            await delete_error(connection)
+            if(data.time != undefined){
+                await request_body(connection,data.area_code,data.date,data.time);
+            }
+        };
     });
     return 0;
 }
@@ -143,10 +139,9 @@ const send_data = async function (body,connection,area_code,base_date,base_time)
         let error_code = await check_apierror(body);
         if(error_code != 0){
             await error_insert(connection,error_code,base_date,base_time,area_code);
+            return 0;
         }
-        else{
-            await save_data(body,area_code,connection,base_date,base_time,insert_data);
-        }
+        await save_data(body,area_code,connection,base_date,base_time,insert_data);
     }
     return 0;
 }
@@ -165,11 +160,9 @@ const error_insert = async function(connection,error,base_date,base_time,area_co
     await connection.query(`INSERT INTO weather_information (date,time,PTY,area_code) VALUES (${base_date},${base_time},${error_code},${area_code})`,function(err, rows) {
         if (err) {
             console.log("에러");
+            return 0;
         }
-        else{
-            console.log("Complete");
-        }
-        return 0;
+        console.log("Complete");
     });
 
     return 0;
@@ -199,11 +192,9 @@ const insert_data = async function(connection,base_date,base_time,pty,reh,rn1,t1
     await connection.query(`INSERT INTO weather_information (date,time,PTY,REH,RN1,T1H,UUU,VEC,VVV,WSD,area_code) VALUES (${base_date},${base_time},${pty},${reh},${rn1},${t1h},${uuu},${vec},${vvv},${wsd},${area_code})`,function(err, rows) {
         if (err) {
             console.log("에러");
+            return 0;
         }
-        else{
-            console.log("Complete");
-        }
-        return 0;
+        console.log("Complete");
     });
     return 0;
 }
