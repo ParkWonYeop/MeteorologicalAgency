@@ -12,9 +12,10 @@ const run_server = function(){
 }
 
 //API에 데이터를 지속적으로 요청함//
-const run_api = function(connection){
-    let base_date = set_date();
-    let base_time = set_time();
+const run_api = async function(){
+    const connection = await user_database();
+    let base_date = await set_date();
+    let base_time = await set_time();
     request_api(connection,base_date,base_time);
     setInterval(function(){
         base_time = check_api(connection,base_time)

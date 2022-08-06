@@ -2,7 +2,7 @@ const { createConnection } = require("mysql");
 const request = require('request');
 
 //데이터베이스 연결//
-const user_database = function(){
+const user_database = async function(){
     const connection= createConnection({
         host     : process.env.DB_HOST,       // 호스트 주소
         user     : process.env.DB_USER,       // mysql user
@@ -29,7 +29,7 @@ const check_api = async function(connection,base_time){
 //지역코드를 받아와 API에 데이터를 요청함//
 const request_api = async function(connection,base_date,base_time){
     let area_code = [];
-    await connection.query('SELECT area_code FROM local_information',async function(err, result){
+    await connection.query(`SELECT area_code FROM local_information`,async function(err, result){
         if(err){
             console.log('데이터베이스 오류');
         }
@@ -66,7 +66,7 @@ const check_error = async function(connection){
 }
 
 //현재 날짜를 받아옴//
-const set_date = function(){
+const set_date = async function(){
     let today = new Date();
     let year = (today.getFullYear()).toString(); // 년도
     let month = (today.getMonth() + 1).toString();  // 월
@@ -85,7 +85,7 @@ const set_date = function(){
 }
 
 //현재시간을 받아옴//
-const set_time = function(){
+const set_time = async function(){
     let today = new Date();
     let hours = (today.getHours()).toString();
 
