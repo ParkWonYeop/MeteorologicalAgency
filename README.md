@@ -11,7 +11,7 @@
     - OPTION
     - HEAD 
 3. REST-API > 스터디 / RESTful-API 차이?
-4. 4. Request 에 데이터를 보내는 방법
+4. Request 에 데이터를 보내는 방법
     - url
       > www.asdf.com?a=1&b=2&c=study > params
       > www.asdf.com/1/2/b/4 > path variable
