@@ -9,6 +9,7 @@ const run_server = function () {
   const app = express();
   set_app(app, router);
   const server = createServer(app).listen(80);
+  run_api();
 };
 
 //API에 데이터를 지속적으로 요청함//
@@ -24,5 +25,4 @@ const run_api = async function () {
 
 module.exports = {
   run_server: run_server,
-  run_api: run_api,
 };
