@@ -1,8 +1,8 @@
 const {request_api, user_database, set_date, set_time, check_api} = require('./api_function.js');
-const {set_app} = require('./web_function');
+const {set_app} = require(`./web_function`);
 const express = require('express');
 const {createServer} = require('http');
-const router = require('../router/app.js');
+const router = require(`../router/main_router.js`);
 
 //서버를 실행시킴//
 const run_server = function () {

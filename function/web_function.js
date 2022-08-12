@@ -8,8 +8,6 @@ const set_app = function (app, router) {
   app.use(body_parser.urlencoded({extended: true}));
   app.use(cookieParser());
   app.use('/', router);
-  app.set('view engine', 'ejs');
-  app.set('views', '../views');
   console.log('server is running...');
 };
 
