@@ -3,13 +3,13 @@
 - 2022.08.09
 1. MVC 패턴 > 스터디 > 리팩토링 해오기.
 2. HTTP METHOD > 스터디
-  - GET 
+  - GET
   - POST
   - DELETE
   - PUT
   - PATCH
   - OPTION
-  - HEAD 
+  - HEAD
 3. REST-API > 스터디 / RESTful-API 차이?
 4. Request 에 데이터를 보내는 방법
   - url
