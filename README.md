@@ -1,21 +1,17 @@
 # MeteorologicalAgency
 
-- 2022.08.09
-1. MVC 패턴 > 스터디 > 리팩토링 해오기.
-2. HTTP METHOD > 스터디
-  - GET
-  - POST
-  - DELETE
-  - PUT
-  - PATCH
-  - OPTION
-  - HEAD
-3. REST-API > 스터디 / RESTful-API 차이?
-4. Request 에 데이터를 보내는 방법
-  - url
-    > www.asdf.com?a=1&b=2&c=study > params
-    > www.asdf.com/1/2/b/4 > path variable
-  - body
-    > json, xml, form-data
-5. .js를 붙여서 require 하는것과 안붙이는 것 차이 
-6. expressJS의 예외처리 스터디 
+- 2022.08.16
+1. PUT vs PATCH 조금 더 스터디 후 토론
+2. camelCase로 네이밍 변경  
+3. HTTP STATUS CODE > 스터디 
+   1. 2XX > 성공
+   2. 4XX > 실패 (원인:클라이언트) 
+   3. 5XX > 실패 (원인:서버)
+4. 데이터베이스에 USER라는 테이블을 아래와 같이 생성 후 POST / GET / DELETE / PUT 메소드 사용해서 API 하나씩 만들어 오기. 
+   1. ID (PK)
+   2. EMAIL
+   3. PASSWORD 
+5. DTO, DAO 스터디 후 적용 (Model이랑 개념이 혼동될 수 있는데 마음껏 틀려보기)
+   1. DAO 스터디 후 api_function 로직 분리
+6. service layer
+   1. 비지니스 로직이 들어가는 부분들을 분리해서 리팩토링
