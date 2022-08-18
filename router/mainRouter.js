@@ -1,10 +1,10 @@
 const express = require('express');
-const {main_contorller} = require(`../controller/main_controller`)
+const {mainContorller} = require(`../controller/mainController`)
 
 const router = express.Router();
 
 router.get('/main', function (req, res) {
-  main_contorller(res);
+  mainContorller(res);
 });
 
 module.exports = router;

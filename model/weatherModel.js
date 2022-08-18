@@ -1,24 +1,24 @@
-const {user_database} = require(`../function/api_function`);
-const connection = user_database();
+const {userDatabase} = require(`../function/apiFunction`);
+const connection = userDatabase();
 
 // 날씨 정보 모델을 반환
-const weather_model = async function(){
-    const [area_error, area_information] = await get_area_information();
-    const [weather_error, weather_information] = await get_weather_information();
+const weatherModel = async function(){
+    const [areaError, areaInformation] = await getAreainformation();
+    const [weatherError, weatherInformation] = await getWeatherinformation();
     (await connection).end();
 
-    if(area_error === 1 || weather_error === 1){
+    if(areaError === 1 || weatherError === 1){
         return [1,1];
     }
-    return [area_information,weather_information];
+    return [areaInformation,weatherInformation];
 }
 
 // 지역 정보 요청
-const get_area_information = async function(){
+const getAreainformation = async function(){
     connection.query(`SELECT area_code,County,City,longitude,latitude FROM local_information`, function (err, result) {
-        const area_information = []
+        const areaInformation = []
         for(data of result){
-            area_information.push({
+            areaInformation.push({
                 "area_code" : data.area_code,
                 "county_name" :data.County,
                 "city_name" :data.City,
@@ -26,16 +26,16 @@ const get_area_information = async function(){
                 "latitude" : data.latitude
             });
         }
-        return [err, area_information]
+        return [err, areaInformation]
     });
 }
 
 // 날씨 정보 요청
-const get_weather_information = async function(){
+const getWeatherinformation = async function(){
     connection.query('SELECT * FROM weather_information', function (err, results) {
-        const weather_information = [];
+        const weatherInformation = [];
         for(data of result){
-            weather_information.push({
+            weatherInformation.push({
                 "area_code" : data.area_code, 
                 "date" :data.date,
                 "time" :data.time,
@@ -49,10 +49,10 @@ const get_weather_information = async function(){
                 "wsd" : data.WSD,
             });
         }
-        return [err, weather_information]
+        return [err, weatherInformation]
     });
 }
 
 module.exports = {
-    weather_model: weather_model
+    weatherModel: weatherModel
 };
