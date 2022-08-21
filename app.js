@@ -1,2 +1,2 @@
-const {run_server, run_api} = require('./function/mainFunction');
+const {run_server} = require('./function/mainFunction');
 run_server();

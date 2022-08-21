@@ -13,7 +13,6 @@ const runServer = function () {
   const app = express();
   setApp(app);
   const server = createServer(app).listen(80);
-  runApi();
 };
 
 const setApp = function (app) {
@@ -27,7 +26,8 @@ const setApp = function (app) {
 };
 
 //API에 데이터를 지속적으로 요청함//
-const runApi = async function () {
+//웹서버에서는 사용하지 않는 기능//
+/*const runApi = async function () {
   const connection = await userDatabase();
   let baseDate = await setDate();
   let baseTime = await setTime();
@@ -35,7 +35,7 @@ const runApi = async function () {
   setInterval(function () {
     baseTime = checkApi(connection, baseTime);
   }, 600000);
-};
+};*/
 
 module.exports = {
   runServer: runServer,
