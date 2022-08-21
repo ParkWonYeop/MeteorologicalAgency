@@ -64,39 +64,6 @@ const checkError = async function (connection) {
   return 0;
 };
 
-//현재 날짜를 받아옴//
-const setDate = async function () {
-  let today = new Date();
-  let year = today.getFullYear().toString(); // 년도
-  let month = (today.getMonth() + 1).toString(); // 월
-  let date = today.getDate().toString(); // 날짜
-
-  if (today.getMonth() < 9) {
-    month = '0' + month;
-  }
-  if (today.getDate() < 10) {
-    date = '0' + date;
-  }
-
-  let baseDate = year + month + date; /* 날짜 */
-
-  return baseDate;
-};
-
-//현재시간을 받아옴//
-const setTime = async function () {
-  let today = new Date();
-  let hours = today.getHours().toString();
-
-  if (today.getHours() < 10) {
-    hours = '0' + hours;
-  }
-
-  let base_time = hours + '00';
-
-  return base_time;
-};
-
 //에러가 난 데이터를 다시 받아오기전에 데이터베이스에서 삭제함//
 const deleteError = async function (connection) {
   await connection.query(
@@ -282,11 +249,52 @@ const saveData = async function (body, areaCode, connection, baseDate, baseTime,
   insertData(connection, baseDate, baseTime, pty, reh, rn1, t1h, uuu, vec, vvv, wsd, areaCode);
 };
 
+// 지역 정보 요청
+const getAreainformation = async function(){
+    connection.query(`SELECT area_code,County,City,longitude,latitude FROM local_information`, function (err, result) {
+        const areaInformation = []
+        for(data of result){
+            areaInformation.push({
+                "area_code" : data.area_code,
+                "county_name" :data.County,
+                "city_name" :data.City,
+                "longitude" : data.longitude,
+                "latitude" : data.latitude
+            });
+        }
+        return [err, areaInformation]
+    });
+}
+
+// 날씨 정보 요청
+const getWeatherinformation = async function(){
+    connection.query('SELECT * FROM weather_information', function (err, results) {
+        const weatherInformation = [];
+        for(data of result){
+            weatherInformation.push({
+                "area_code" : data.area_code, 
+                "date" :data.date,
+                "time" :data.time,
+                "pty" : data.PTY,
+                "reh" : data.REH,
+                "rn1" : data.RN1,
+                "t1h" : data.T1H,
+                "uuu" : data.UUU,
+                "vvv" : data.VVV,
+                "vec" : data.VEC,
+                "wsd" : data.WSD,
+            });
+        }
+        return [err, weatherInformation]
+    });
+}
+
 module.exports = {
-  userDatabase: userDatabase,
-  checkApi: checkApi,
-  requestApi: requestApi,
-  checkError: checkError,
-  setDate: setDate,
-  setTime: setTime,
+  userDatabase,
+  checkApi,
+  requestApi,
+  checkError,
+  getWeatherinformation,
+  getAreainformation
 };
+
