@@ -4,8 +4,8 @@ const {getUser,postUser,putUser,deleteUser} = require(`../controllers/loginContr
 const userRouter = express.Router();
 
 userRouter.get('/',getUser);
-userRouter.get('/',postUser);
-userRouter.get('/',putUser);
-userRouter.get('/',deleteUser);
+userRouter.post('/',postUser);
+userRouter.put('/',putUser);
+userRouter.delete('/',deleteUser);
 
 module.exports = userRouter;
