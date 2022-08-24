@@ -7,7 +7,7 @@ const getWeathermodel = async function(){
     (await connection).end();
 
     if(weatherError === 1){
-        return [1,1];
+        return 1;
     }
     return weatherInformation;
 }
@@ -17,7 +17,7 @@ const getAreamodel = async function(){
     (await connection).end();
 
     if(areaError === 1){
-        return [1,1];
+        return 1;
     }
     return areaInformation;
 }

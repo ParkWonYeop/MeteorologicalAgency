@@ -1,15 +1,15 @@
-const {mainDTO,getAreainformation,getWeatherinformation} = require(`../DTOs/mainDTO`)
+const {MainInformation} = require(`../DTOs/mainDTO`)
 
 const mainService = async function(res){
-    await mainDTO();
-    const areaInformation = await getAreainformation();
-    const weatherInformation = await getWeatherinformation();
+    const areaWeatherInformation = new MainInformation();
+    const areaInformation = areaWeatherInformation.getareainformation();
+    const weatherInformation= areaWeatherInformation.getweatherinformation();
 
     if(areaInformation === 1 || weatherInformation === 1){
         res.send(`데이터베이스 오류`);
     }
     else{
-        res.json(areaInformation,weatherInformation);
+        res.json(weatherInformation,areaInformation);
     }
 }
 

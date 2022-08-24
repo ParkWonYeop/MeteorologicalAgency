@@ -1,4 +1,4 @@
-const {getUserdata,getUserEmail,getUserID,getUserPW,setUserdata,deleteUserdata,checkUserdata} = require(`../DAOs/userDAO`)
+const {getUserEmail,getUserID,getUserPW,setUserdata,deleteUserdata,checkUserdata} = require(`../DAOs/userDAO`)
 const {userDatabase} = require(`../DAOs/mainDAO`);
 
 const checkUserdataModel = async function(){
@@ -9,16 +9,6 @@ const checkUserdataModel = async function(){
 
     if(error === 1)return 1;
     return 0;
-}
-
-const getUserdataModel = async function(){
-    const connection = await userDatabase();
-    const userData = await getUserdata(connection);
-    connection.end();
-
-    if(userData === 1) return 1;
-
-    return userData;
 }
 
 const getUserIDModel = async function(){
@@ -73,7 +63,6 @@ const deleteUserdataModel = async function(ID,PW){
 
 module.exports = {
     getUserEmailModel,
-    getUserdataModel,
     getUserIDModel,
     getUserPWModel,
     setUserdataModel,
