@@ -5,7 +5,6 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const mainRouter = require(`../routers/mainRouter`);
 const userRouter = require(`../routers/userRouter`);
-const {setDate, setTime} = require('./etcFunction');
 const {requestApi, userDatabase, checkApi } = require(`../DAOs/mainDAO`);
 
 //서버를 실행시킴//
@@ -24,18 +23,6 @@ const setApp = function (app) {
   app.use('/user',userRouter);
   console.log('server is running...');
 };
-
-//API에 데이터를 지속적으로 요청함//
-//웹서버에서는 사용하지 않는 기능//
-/*const runApi = async function () {
-  const connection = await userDatabase();
-  let baseDate = await setDate();
-  let baseTime = await setTime();
-  requestApi(connection, baseDate, baseTime);
-  setInterval(function () {
-    baseTime = checkApi(connection, baseTime);
-  }, 600000);
-};*/
 
 module.exports = {
   runServer: runServer,
