@@ -23,6 +23,8 @@
     "sequelize": "^6.20.1",
     "server": "^0.0.3",
     "session": "^0.1.0",
+    "winston": "^3.8.1",
+    "winston-daily-rotate-file": "^4.7.1",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {

@@ -1,17 +1,17 @@
 const {getUserService,postUserService,deleteUserService,putUserService} = require(`../services/userService`)
 
-const getUser = async function(res,req){
-    getUserService(res);
+const getUser = async function(request, response){
+    getUserService(response);
 }
-const postUser = async function(res,req){
-    postUserService(res,req);
+const postUser = async function(request, response){
+    postUserService(request, response);
 }
-const deleteUser = async function(res,req){
-    deleteUserService(res,req);
+const deleteUser = async function(request, response){
+    deleteUserService(request, response);
 }
 
-const putUser = async function(res,req){
-    putUserService(res,req);
+const putUser = async function(request, response){
+    putUserService(request, response);
 }
 
 module.exports = {
