@@ -1,22 +1,34 @@
-const {getUserService,postUserService,deleteUserService,putUserService} = require(`../services/userService`)
+const userService = require(`../services/userService`)
 
-const getUser = async function(request, response){
-    getUserService(response);
-}
-const postUser = async function(request, response){
-    postUserService(request, response);
-}
-const deleteUser = async function(request, response){
-    deleteUserService(request, response);
+const referenceUserdata = async function(request, response){
+    userService.referenceUserdata(request,response);
 }
 
-const putUser = async function(request, response){
-    putUserService(request, response);
+const login = async function(request, response){  
+    userService.login(request, response);
+}
+
+const signup = async function(request, response){
+    userService.signup(request, response);
+}
+
+const changeUserdata = async function(request, response){
+    userService.changeUserdata(request, response);
+}
+
+const deleteUserdata = async function(request, response){
+    userService.deleteUserdata(request, response);
+}
+
+const changePassword = async function(request, response){
+    userService.changePassword(request, response);
 }
 
 module.exports = {
-    getUser:getUser,
-    postUser:postUser,
-    deleteUser,deleteUser,
-    putUser,putUser
+    referenceUserdata,
+    login,
+    signup,
+    changeUserdata,
+    changePassword,
+    deleteUserdata
 }
