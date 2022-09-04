@@ -7,7 +7,7 @@ userRouter.get('/',userController.referenceUserdata);
 userRouter.post('/login',userController.login);
 userRouter.post('/signup',userController.signup);
 userRouter.put('/',userController.changeUserdata);
-userRouter.put('/',userController.deleteUserdata);
+userRouter.put('/:id',userController.deleteUserdata);
 userRouter.put('/password',userController.changePassword);
 
 module.exports = userRouter;

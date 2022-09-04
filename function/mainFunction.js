@@ -1,12 +1,11 @@
 const express = require('express');
 const {createServer} = require('http');
 const bodyParser = require('body-parser');
-//const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 const cors = require('cors');
 const userRouter = require(`../routers/userRouter`);
-const {requestApi, userDatabase, checkApi } = require(`../DAOs/mainDAO`);
+const logger = require(`../config/winston`);
 
 //서버를 실행시킴//
 const runServer = function () {
@@ -19,7 +18,8 @@ const setApp = function (app) {
   app.use(cors());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
-  //app.use(cookieParser('housecleanparty'));
+  app.use('/user',userRouter);
+
   app.use(session({
     secret : `housecleanparty`,
     resave : false,
@@ -29,9 +29,12 @@ const setApp = function (app) {
       maxAge:600000
     },
   }))
-  app.use('/', mainRouter);
-  app.use('/user',userRouter);
-  console.log('server is running...');
+
+  app.listen(3000, () => {
+    logger.info('Server listening on port 3000');
+  });
+
+  //console.log('server is running...');
 };
 
 module.exports = {

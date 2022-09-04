@@ -2,7 +2,7 @@ const {createConnection} = require('mysql');
 const request = require('request');
 
 //데이터베이스 연결//
-const userDatabase = async function () {
+const connectDatabase = async function () {
   const connection = createConnection({
     host: process.env.DB_HOST, // 호스트 주소
     user: process.env.DB_USER, // mysql user
@@ -13,45 +13,71 @@ const userDatabase = async function () {
   return connection;
 };
 
-const checkUserdata = async function(connection,ID,PW){
-  await connection.query(`SELECT ID,PW,Email FROM user_data where ID = ${ID} and PW = ${PW}`, async function (err, result) {
+const checkUserdata = async function(connection,email,password){
+  await connection.query(`SELECT password,Email FROM user_data where email = ${email} and password = SHA2(${password},512)`, async function (err, result) {
       if(err){
-          return 1;
+        await connection.end();
+        return 0;
       }
-      return 0;
+      await connection.end();
+      return result.length;
   });
 }
-p
 
-const setUserdata = async function(connection,ID,PW,Email){
-  await connection.query(`INSERT INTO user_data (ID,PW,Email) VALUES (${ID},${PW},${Email})`,function (err) {
+const saveUserdata = async function(connection,email,password){
+  await connection.query(`INSERT INTO user_data (email,password) VALUES (${email},SHA2(${password},512))`,async function (err) {
       if (err) {
-          return 1;
+        await connection.end();
+        return 1;
       }
-          return 0;
+      await connection.end();
+      return 0;
       },
   );
 }
 
-const deleteUserdata = async function(connection,ID,PW){
-  await connection.query(`DELETE FROM user_data where ID = ${ID} and PW = ${PW}`,async function (err) {
+const deleteUserdata = async function(connection,email){
+  await connection.query(`DELETE FROM user_data where email = ${email}`,async function (err) {
       if (err) {
-          return 1
+        await connection.end();
+        return 1
       }
+      await connection.end();
       return 0;
       },
     );
 }
 
+const changeUserdata = async function(connection,email,changeEmail){
+  await connection.query(`UPDATE user_data SET email = ${changeEmail} WHERE email = ${email};`,async function (err) {
+    if (err) {
+      await connection.end();
+      return 1
+    }
+    await connection.end();
+    return 0;
+    },
+  );
+}
+
+const changePassword = async function(connection,email,password){
+  await connection.query(`UPDATE user_data SET password = SHA2(${password},512) WHERE email = ${email};`,async function (err) {
+    if (err) {
+      await connection.end();
+      return 1
+    }
+    await connection.end();
+    return 0;
+    },
+  );
+}
+
 module.exports = {
-  userDatabase,
-  checkApi,
-  requestApi,
-  checkError,
-  getWeatherinformation,
-  getAreainformation,
-  setUserdata,
+  connectDatabase,
+  saveUserdata,
   deleteUserdata,
-  checkUserdata
+  checkUserdata,
+  changePassword,
+  changeUserdata
 };
 
