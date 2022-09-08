@@ -34,7 +34,7 @@ const setApp = function (app) {
     logger.info('Server listening on port 3000');
   });
 
-  //console.log('server is running...');
+  console.log('server is running...');
 };
 
 module.exports = {

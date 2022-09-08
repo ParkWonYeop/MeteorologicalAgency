@@ -1,37 +1,14 @@
-//현재 날짜를 받아옴//
-const setDate = async function () {
-  let today = new Date();
-  let year = today.getFullYear().toString(); // 년도
-  let month = (today.getMonth() + 1).toString(); // 월
-  let date = today.getDate().toString(); // 날짜
+const crypto = require('crypto');
 
-  if (today.getMonth() < 9) {
-    month = '0' + month;
-  }
-  if (today.getDate() < 10) {
-    date = '0' + date;
-  }
+const createSalt = async function(){
+  return crypto.randomBytes(128).toString(`base64`);
+}
 
-  let baseDate = year + month + date; /* 날짜 */
+const hashPassword = async function(password,salt){
+  return crypto.createHash(`sha512`).update(password+salt).digest(`base64`);
+}
 
-  return baseDate;
-};
-
-//현재시간을 받아옴//
-const setTime = async function () {
-  let today = new Date();
-  let hours = today.getHours().toString();
-
-  if (today.getHours() < 10) {
-    hours = '0' + hours;
-  }
-
-  let base_time = hours + '00';
-
-  return base_time;
-};
-
-module.exports = {
-  setDate,
-  setTime
+module.exports ={
+  createSalt,
+  hashPassword
 }

@@ -1,5 +1,6 @@
 const {createConnection} = require('mysql');
-const request = require('request');
+const etcFunc = require('../function/etcFunction');
+require("dotenv").config();
 
 //데이터베이스 연결//
 const connectDatabase = async function () {
@@ -13,71 +14,121 @@ const connectDatabase = async function () {
   return connection;
 };
 
-const checkUserdata = async function(connection,email,password){
-  await connection.query(`SELECT password,Email FROM user_data where email = ${email} and password = SHA2(${password},512)`, async function (err, result) {
-      if(err){
-        await connection.end();
-        return 0;
-      }
-      await connection.end();
-      return result.length;
+const requestUserdata = async function(email,response){
+  const connection = await connectDatabase();
+  connection.query(`SELECT email,password FROM user_data where email = '${email}'`, function (err, result) {
+    if(err){
+      console.log(err);
+      connection.end();
+      return response(1)
+    }
+    connection.end();
+    console.log(result);
+    if(result.length === 0){
+      return response(1)
+    }
+    return response(result);
   });
 }
 
-const saveUserdata = async function(connection,email,password){
-  await connection.query(`INSERT INTO user_data (email,password) VALUES (${email},SHA2(${password},512))`,async function (err) {
+const requestPasswordsalt = async function(email,password,response,loginCheck){
+  const connection = await connectDatabase();
+  connection.query(`SELECT password_salt FROM user_data where email = '${email}'`, async function (err, result) {
+    if(err){
+      console.log(err);
+      connection.end();
+      return 1;
+    }
+    connection.end();
+    if(result.length === 0){
+      return loginCheck(response,0);
+    }
+    return checkUserdata(email,password,result[0].password_salt,response,loginCheck);
+  });
+}
+
+const checkUserdata = async function(email,password,passwordSalt,response,loginCheck){
+  const connection = await connectDatabase()
+  const hashPassword = await etcFunc.hashPassword(password,passwordSalt);
+  connection.query(`SELECT email FROM user_data where email = '${email}' and password = '${hashPassword}'`, function (err, result) {
+      if(err){
+        connection.end();
+        console.log(err);
+        return loginCheck(response,0)
+      }
+      connection.end();
+      console.log(result)
+      return loginCheck(response,result.length);
+  });
+}
+
+const saveUserdata = async function(email,password){
+  const connection = await connectDatabase()
+  const passwordSalt = etcFunc.createSalt();
+  const hashPassword = etcFunc.hashPassword(password,passwordSalt);
+  connection.query(`INSERT INTO user_data (email,password,password_salt) VALUES ('${email}','${hashPassword}','${passwordSalt}')`,async function (err) {
       if (err) {
-        await connection.end();
+        console.log(err)
+        connection.end();
         return 1;
       }
-      await connection.end();
+      connection.end();
       return 0;
       },
   );
 }
 
-const deleteUserdata = async function(connection,email){
-  await connection.query(`DELETE FROM user_data where email = ${email}`,async function (err) {
-      if (err) {
-        await connection.end();
-        return 1
-      }
-      await connection.end();
-      return 0;
-      },
-    );
-}
-
-const changeUserdata = async function(connection,email,changeEmail){
-  await connection.query(`UPDATE user_data SET email = ${changeEmail} WHERE email = ${email};`,async function (err) {
+const deleteUserdata = async function(email){
+  const connection = await connectDatabase()
+  connection.query(`DELETE FROM user_data where email = '${email}'`, async function (err) {
     if (err) {
-      await connection.end();
-      return 1
+      connection.end();
+      console.log(err);
+      return 1;
     }
-    await connection.end();
+    connection.end();
     return 0;
-    },
+  }
   );
 }
 
-const changePassword = async function(connection,email,password){
-  await connection.query(`UPDATE user_data SET password = SHA2(${password},512) WHERE email = ${email};`,async function (err) {
+const changeUserdata = async function(email,changeEmail,response){
+  const connection = await connectDatabase()
+  connection.query(`UPDATE user_data SET email = '${changeEmail}' WHERE email = '${email}';`, async function (err) {
     if (err) {
-      await connection.end();
-      return 1
+      connection.end();
+      return response(1);
     }
-    await connection.end();
+    connection.end();
+    return response(0);
+  }
+  );
+}
+
+const changePassword = async function(email,password){
+  const connection = await connectDatabase()
+  const passwordSalt = await etcFunc.createSalt();
+  const hashPassword = await etcFunc.hashPassword(password,passwordSalt);
+  connection.query(`UPDATE user_data SET password = '${hashPassword}' ,password_salt = '${passwordSalt}' WHERE email = '${email}'`, async function (err) {
+    if (err) {
+      connection.end();
+      console.log(err);
+      return 1;
+    }
+    connection.end();
     return 0;
-    },
+  }
   );
 }
 
 module.exports = {
+  requestUserdata,
   connectDatabase,
   saveUserdata,
   deleteUserdata,
   checkUserdata,
   changePassword,
-  changeUserdata
+  changeUserdata,
+  requestPasswordsalt
 };
 
