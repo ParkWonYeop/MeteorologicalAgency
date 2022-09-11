@@ -1,105 +1,143 @@
-const mainDao = require(`../Dao/mainDao`);
+//const mainDao = require(`../Dao/mainDao`);
+const {MainDao} = require(`../Dao/mainDao`);
 const logger = require(`../config/winston`);
-const { check } = require("prettier");
 
-const referenceUserdata = async function(request, response){
-    const responseUserdata = async function(result){
+class UserService{
+    #request;
+    #response;
+
+    //생성자
+    constructor(request,response){
+        this.#request = request;
+        this.#response = response;
+    }
+
+    //유저정보 요청
+    async referenceUserdata(){
+        const mainDao = new MainDao();
+        const result = await mainDao.requestUserdata(this.#request.params.email)
+        mainDao.disconnectDatabase();
         if(result === 1){
             logger.error('fail refernceUserdata');
-            return response.sendStatus(500);
+            return this.#response.sendStatus(500);
         }
         logger.info('GET /user');
-        return response.send(result);
+        return this.#response.send(result);
     }
-    await mainDao.requestUserdata(request.params.email,responseUserdata);
-}
 
-const login = async function(request, response){
-    const loginCheck = async function(checkError){
-        if(checkError == 0){
+    //로그인
+    async login(){
+        const mainDao = new MainDao();
+        const passwordSalt = await mainDao.requestPasswordsalt(this.#request.body.email);
+        const loginCheck = await mainDao.checkUserdata(this.#request.body.email,this.#request.body.password,passwordSalt);
+        mainDao.disconnectDatabase();
+        if(loginCheck == 0){
             logger.error('login fail login');  
-            return response.sendStatus(500)
+            return this.#response.sendStatus(500)
         }
         logger.info('post /user/login');
-        return response.send(`로그인 성공`);
+        return this.#response.send(`로그인 성공`);
     }
-    const userEmail = request.body.email;
-    const userPassword = request.body.password;
-    mainDao.requestPasswordsalt(userEmail,userPassword,loginCheck);
-}
 
-const signup = async function(request, response){
-    const userEmail = request.body.email;
-    const userPassword = request.body.password;
-    const checkPassword = request.body.checkPassword;
-    console.log(userEmail);
-    if(userPassword !== checkPassword){
-        logger.error('signup not equal password');
-        return response.sendStatus(500)
-    }
-    if(userPassword.length < 5){
-        logger.error('signup too short password');
-        return response.sendStatus(500)
-    }
-    if(userEmail.length < 5){
-        logger.error('signup too short email');
-        return response.sendStatus(500)
-    }
-    const checkError = await mainDao.saveUserdata(userEmail,userPassword);
-    if(checkError === 0){
-        logger.info('post /user/signup');
-        return response.send(`회원가입 성공`);
-    }
-    logger.error('signup Database error');
-    return response.sendStatus(500)
-}
+    //회원가입
+    async signup(){
+        const mainDao = new MainDao();
+        const userEmail = this.#request.body.email;
+        const userPassword = this.#request.body.password;
+        const checkPassword = this.#request.body.checkPassword;
+        const overlapEmail = await mainDao.checkEmailOverlap(userEmail);
 
-const changeUserdata = async function(request, response){
-    const responseChange = async function(checkError){
+        if(overlapEmail > 0){
+            logger.error('signup overlap email');
+            return this.#response.sendStatus(500);
+        }
+
+        console.log(userEmail);
+
+        if(userPassword !== checkPassword){
+            logger.error('signup not equal password');
+            return this.#response.sendStatus(500)
+        }
+        if(userPassword.length < 5){
+            logger.error('signup too short password');
+            return this.#response.sendStatus(500)
+        }
+        if(userEmail.length < 5){
+            logger.error('signup too short email');
+            return this.#response.sendStatus(500)
+        }
+
+        const checkError = await mainDao.saveUserdata(userEmail,userPassword);
+        mainDao.disconnectDatabase();
+
+        if(checkError === 0){
+            logger.info('post /user/signup');
+            return this.#response.send(`회원가입 성공`);
+        }
+
+        logger.error('signup Database error');
+        return this.#response.sendStatus(500)
+    }
+
+    //유저정보 변경
+    async changeUserdata(){
+        const mainDao = new MainDao();
+        const overlapEmail = await mainDao.checkEmailOverlap(this.#request.body.changeEmail);
+
+        if(overlapEmail > 0){
+            logger.error('changeUserdata overlap email');
+            return this.#response.sendStatus(500);
+        }
+        if(this.#request.body.changeEmail == undefined){
+            logger.error('changeUserdata changeEmail is undefined');
+            return this.#response.sendStatus(500);
+        }
+        if(this.#request.body.changeEmail < 5){
+            logger.error('changeUserdata too short email');
+            return this.#response.sendStatus(500);
+        }
+        
+        const checkError = await mainDao.changeUserdata(this.#request.body.email,this.#request.body.changeEmail);
+        mainDao.disconnectDatabase();
+
         if(checkError === 1){
             logger.error('changeUserdata Database error');
-            return response.sendStatus(500);
+            return this.#response.sendStatus(500);
         }
         logger.info('put /user change');
-        return response.send(`변경 완료`);
+        return this.#response.send(`변경 완료`);
     }
 
-    if(request.body.changeEmail < 5){
-        logger.error('changeUserdata too short email');
-        return response.sendStatus(500);
+    //삭제
+    async deleteUserdata(){
+        const mainDao = new MainDao();
+        const checkError = await mainDao.deleteUserdata(this.#request.params.email);
+        mainDao.disconnectDatabase();
+        console.log(checkError)
+        if(checkError === 1){
+            logger.error('deleteUserdata Database error');
+            return this.#response.sendStatus(500);
+        }
+        logger.info('put /user delete');
+        return this.#response.send(`삭제 완료`);
     }
-    await mainDao.changeUserdata(request.body.email,request.body.changeEmail,responseChange); 
+
+    //비밀번호 변경
+    async changePassword(){
+        const mainDao = new MainDao();
+        if(this.#request.body.changePassword < 5){
+            logger.error('changePassword too short password');
+            return this.#response.sendStatus(500).send(`비밀번호가 너무 짧습니다.`);
+        }
+        const checkError = await mainDao.changePassword(this.#request.body.email, this.#request.body.changePassword)
+        mainDao.disconnectDatabase();
+        if(checkError === 1){
+            logger.error('changePassword Database error');
+            return this.#response.sendStatus(500);
+        }
+        logger.info('put /user/password');
+        return this.#response.send(`비밀번호 변경 완료`);
+    }
 }
 
-const deleteUserdata = async function(request, response){
-    const checkError = await mainDao.deleteUserdata(request.params.email);
-    if(checkError === 1){
-        logger.error('deleteUserdata Database error');
-        return response.sendStatus(500);
-    }
-    logger.info('put /user delete');
-    return response.send(`삭제 완료`);
-}
-
-const changePassword = async function(request, response){
-    if(request.body.changePassword < 5){
-        logger.error('changePassword too short password');
-        return response.sendStatus(500).send(`비밀번호가 너무 짧습니다.`);
-    }
-    const checkError = await mainDao.changePassword(request.body.email, request.body.changePassword)
-    if(checkError === 1){
-        logger.error('changePassword Database error');
-        return response.sendStatus(500);
-    }
-    logger.info('put /user/password');
-    return response.send(`비밀번호 변경 완료`);
-}
-
-module.exports ={
-    referenceUserdata,
-    login,
-    signup,
-    changeUserdata,
-    deleteUserdata,
-    changePassword
-}
+module.exports = {UserService};

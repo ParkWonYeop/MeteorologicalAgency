@@ -1,35 +1,50 @@
-const userService = require(`../services/userService`)
+const {UserService} = require(`../services/userService`);
 
+class UserController{
+    #request;
+    #response;
+    
+    //생성자
+    constructor(request,response){
+        this.#request = request;
+        this.#response = response;
+    }
 
-const referenceUserdata = async function(request, response){
-    userService.referenceUserdata(request,response);
+    //유저정보 요청
+    async referenceUserdata(){
+        const userService = new UserService(this.#request,this.#response);
+        await userService.referenceUserdata();
+    }
+
+    //로그인
+    async login(){ 
+        const userService = new UserService(this.#request,this.#response);
+        await userService.login();
+    }
+
+    //회원가입
+    async signup(){
+        const userService = new UserService(this.#request,this.#response);
+        await userService.signup();
+    }
+
+    //유저정보 수정
+    async changeUserdata(){
+        const userService = new UserService(this.#request,this.#response);
+        await userService.changeUserdata();
+    }
+
+    //유저정보 삭제
+    async deleteUserdata(){
+        const userService = new UserService(this.#request,this.#response);
+        await userService.deleteUserdata();
+    }
+
+    //비밀번호 변경
+    async changePassword(){
+        const userService = new UserService(this.#request,this.#response);
+        await userService.changePassword();
+    }
 }
 
-const login = async function(request, response){ 
-    userService.login(request, response);
-}
-
-const signup = async function(request, response){
-    userService.signup(request, response);
-}
-
-const changeUserdata = async function(request, response){
-    userService.changeUserdata(request, response);
-}
-
-const deleteUserdata = async function(request, response){
-    userService.deleteUserdata(request, response);
-}
-
-const changePassword = async function(request, response){
-    userService.changePassword(request, response);
-}
-
-module.exports = {
-    referenceUserdata,
-    login,
-    signup,
-    changeUserdata,
-    changePassword,
-    deleteUserdata
-}
+module.exports = {UserController}
