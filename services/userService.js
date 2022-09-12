@@ -15,7 +15,12 @@ class UserService{
     //유저정보 요청
     async referenceUserdata(){
         const mainDao = new MainDao();
-        const result = await mainDao.requestUserdata(this.#request.params.email)
+        const isDeleted = await mainDao.checkDeleted(this.#request.params.email);
+        if(isDeleted == 1){
+            logger.error('fail refernceUserdata is_deleted');
+            return this.#response.sendStatus(500);
+        }
+        const result = await mainDao.requestUserdata(this.#request.params.email);
         mainDao.disconnectDatabase();
         if(result === 1){
             logger.error('fail refernceUserdata');
@@ -28,6 +33,11 @@ class UserService{
     //로그인
     async login(){
         const mainDao = new MainDao();
+        const isDeleted = await mainDao.checkDeleted(this.#request.body.email);
+        if(isDeleted == 1){
+            logger.error('login fail is_deleted');
+            return this.#response.sendStatus(500);
+        }
         const passwordSalt = await mainDao.requestPasswordsalt(this.#request.body.email);
         const loginCheck = await mainDao.checkUserdata(this.#request.body.email,this.#request.body.password,passwordSalt);
         mainDao.disconnectDatabase();
@@ -82,6 +92,7 @@ class UserService{
     //유저정보 변경
     async changeUserdata(){
         const mainDao = new MainDao();
+
         const overlapEmail = await mainDao.checkEmailOverlap(this.#request.body.changeEmail);
 
         if(overlapEmail > 0){

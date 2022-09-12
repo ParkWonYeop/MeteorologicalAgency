@@ -142,6 +142,22 @@ class MainDao{
             });
         });
     }
+
+    //삭제된 계정 체크
+    async checkDeleted(email){
+        return new Promise((resolve) => {
+            this.#connection.query(`SELECT is_deleted FROM user_data where email = '${email}'`, function (err, result) {
+                if(err){
+                    console.log(err);
+                    resolve(0);
+                }
+                if(result.length == 0){
+                    resolve(0)
+                }
+                resolve(result[0].is_deleted);
+            });
+        });
+    }
 }
 
 module.exports = {MainDao};
