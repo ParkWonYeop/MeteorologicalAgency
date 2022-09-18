@@ -1,11 +1,7 @@
 const crypto = require('crypto');
 
 class Crypto{
-    static instance;
-
     constructor(){
-        if (instance) return instance;
-        instance = this;
     }
 
     //솔트 생성
@@ -19,4 +15,4 @@ class Crypto{
     }
 }
 
-module.exports ={Crypto};
+module.exports = new Crypto;

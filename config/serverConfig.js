@@ -5,7 +5,7 @@ const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 const cors = require('cors');
 const userRouter = require(`../routers/userRouter`);
-const logger = require(`../config/winston`);
+const logger = require(`./winston`);
 
 //서버를 실행시킴//
 const runServer = function () {

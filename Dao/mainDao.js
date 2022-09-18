@@ -1,14 +1,12 @@
 const {createConnection} = require('mysql');
-const {Crypto} = require('../util/cryptoUtil');
+const Crypto = require('../util/cryptoUtil');
 require("dotenv").config();
 
 class MainDao{
     #connection;
-    #crypto;
 
     //생성자
     constructor(){
-        this.#crypto = new Crypto;
         this.#connection = createConnection({
             host: process.env.DB_HOST, // 호스트 주소
             user: process.env.DB_USER, // mysql user
@@ -29,11 +27,11 @@ class MainDao{
             this.#connection.query(`SELECT email,password FROM user_data where email = '${email}'`, function (err, result) {
                 if(err){
                 console.log(err);
-                resolve(1);
+                resolve(false);
                 }
                 console.log(result);
                 if(result.length === 0){
-                resolve(1);
+                resolve(false);
                 }
                 resolve(result);
             })
@@ -46,10 +44,10 @@ class MainDao{
             this.#connection.query(`SELECT password_salt FROM user_data where email = '${email}'`, async function (err, result) {
                 if(err){
                 console.log(err);
-                resolve(0);
+                resolve(false);
                 }
                 if(result.length === 0){
-                resolve(0);
+                resolve(false);
                 }
                 resolve(result[0].password_salt);
             });
@@ -58,33 +56,34 @@ class MainDao{
 
     //유저정보 확인
     async checkUserdata(email,password,passwordSalt){
-        if(passwordSalt === 0){
-            return 0;
+        if(passwordSalt === false){
+            return false;
         }
-        const hashPassword = await this.#crypto.hashPassword(password,passwordSalt);
+        const hashPassword = await Crypto.hashPassword(password,passwordSalt);
         return new Promise((resolve) => {
             this.#connection.query(`SELECT email FROM user_data where email = '${email}' and password = '${hashPassword}'`, function (err, result) {
                 if(err){
                     console.log(err);
-                    resolve(0);
+                    resolve(false);
                 }
                 console.log(result)
-                resolve(result.length);
+                if(result.length === 0)resolve(false);
+                resolve(true);
             });
         });
     }
 
     //유저정보 저장
     async saveUserdata(email,password){
-        const passwordSalt = await this.#crypto.createSalt();
-        const hashPassword = await this.#crypto.hashPassword(password,passwordSalt);
+        const passwordSalt = await Crypto.createSalt();
+        const hashPassword = await Crypto.hashPassword(password,passwordSalt);
         return new Promise((resolve) => {
             this.#connection.query(`INSERT INTO user_data (email,password,password_salt) VALUES ('${email}','${hashPassword}','${passwordSalt}')`,async function (err) {
                 if (err) {
                     console.log(err)
-                    esolve(1);
+                    resolve(false);
                 }
-                resolve(0);
+                resolve(true);
             });
         });
     }
@@ -95,10 +94,11 @@ class MainDao{
             this.#connection.query(`SELECT email FROM user_data where email = '${email}'`, function (err, result) {
                 if(err){
                     console.log(err);
-                    resolve(0);
+                    resolve(true);
                 }
                 console.log(result)
-                resolve(result.length);
+                if(result.length > 1)resolve(true);
+                resolve(false);
             });
         });
     }
@@ -109,9 +109,9 @@ class MainDao{
             this.#connection.query(`UPDATE user_data SET is_deleted = 1 ,deleted_at = CURRENT_TIMESTAMP WHERE email = '${email}'`, async function (err) {
                 if (err) {
                     console.log(err);
-                    resolve(1);
+                    resolve(false);
                 }
-                resolve(0);
+                resolve(true);
             });
         });
     }
@@ -122,25 +122,25 @@ class MainDao{
             this.#connection.query(`UPDATE user_data SET email = '${changeEmail}' WHERE email = '${email}'`, async function (err) {
                 if (err) {
                     this.#connection.end();
-                    resolve(1);
+                    resolve(false);
                 }
                 this.#connection.end();
-                resolve(0);
+                resolve(true);
             });
         });
     }
 
     //비밀번호 수정
     async changePassword(email,password){
-        const passwordSalt = await this.#crypto.createSalt();
-        const hashPassword = await this.#crypto.hashPassword(password,passwordSalt);
+        const passwordSalt = await Crypto.createSalt();
+        const hashPassword = await Crypto.hashPassword(password,passwordSalt);
         return new Promise((resolve) => {
             this.#connection.query(`UPDATE user_data SET password = '${hashPassword}' ,password_salt = '${passwordSalt}' WHERE email = '${email}'`, async function (err) {
                 if (err) {
                     console.log(err);
-                    resolve(1);
+                    resolve(false);
                 }
-                resolve(0);
+                resolve(true);
             });
         });
     }
@@ -151,12 +151,12 @@ class MainDao{
             this.#connection.query(`SELECT is_deleted FROM user_data where email = '${email}'`, function (err, result) {
                 if(err){
                     console.log(err);
-                    resolve(0);
+                    resolve(true);
                 }
-                if(result.length == 0){
-                    resolve(0)
+                if(result[0].is_deleted === 0){
+                    resolve(false)
                 }
-                resolve(result[0].is_deleted);
+                resolve(true);
             });
         });
     }

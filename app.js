@@ -1,2 +1,2 @@
-const {runServer} = require('./function/mainFunction');
+const {runServer} = require('./config/serverConfig');
 runServer();
