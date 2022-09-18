@@ -1,18 +1,20 @@
 const {createConnection} = require('mysql');
-const etcFunc = require('../function/etcFunction');
+const {Crypto} = require('../util/cryptoUtil');
 require("dotenv").config();
 
 class MainDao{
     #connection;
+    #crypto;
 
     //생성자
     constructor(){
+        this.#crypto = new Crypto;
         this.#connection = createConnection({
             host: process.env.DB_HOST, // 호스트 주소
             user: process.env.DB_USER, // mysql user
             password: process.env.DB_PASS, // mysql password
             database: process.env.DB_NAME, // mysql 데이터베이스
-        });;
+        });
         this.#connection.connect();
     }
 
@@ -59,7 +61,7 @@ class MainDao{
         if(passwordSalt === 0){
             return 0;
         }
-        const hashPassword = await etcFunc.hashPassword(password,passwordSalt);
+        const hashPassword = await this.#crypto.hashPassword(password,passwordSalt);
         return new Promise((resolve) => {
             this.#connection.query(`SELECT email FROM user_data where email = '${email}' and password = '${hashPassword}'`, function (err, result) {
                 if(err){
@@ -74,8 +76,8 @@ class MainDao{
 
     //유저정보 저장
     async saveUserdata(email,password){
-        const passwordSalt = await etcFunc.createSalt();
-        const hashPassword = await etcFunc.hashPassword(password,passwordSalt);
+        const passwordSalt = await this.#crypto.createSalt();
+        const hashPassword = await this.#crypto.hashPassword(password,passwordSalt);
         return new Promise((resolve) => {
             this.#connection.query(`INSERT INTO user_data (email,password,password_salt) VALUES ('${email}','${hashPassword}','${passwordSalt}')`,async function (err) {
                 if (err) {
@@ -130,8 +132,8 @@ class MainDao{
 
     //비밀번호 수정
     async changePassword(email,password){
-        const passwordSalt = await etcFunc.createSalt();
-        const hashPassword = await etcFunc.hashPassword(password,passwordSalt);
+        const passwordSalt = await this.#crypto.createSalt();
+        const hashPassword = await this.#crypto.hashPassword(password,passwordSalt);
         return new Promise((resolve) => {
             this.#connection.query(`UPDATE user_data SET password = '${hashPassword}' ,password_salt = '${passwordSalt}' WHERE email = '${email}'`, async function (err) {
                 if (err) {
