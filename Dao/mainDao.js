@@ -24,7 +24,7 @@ class MainDao{
     //유저정보 요청
     async requestUserdata(email){
         return new Promise((resolve) => {
-            this.#connection.query(`SELECT email,password FROM user_data where email = '${connection.escape(email)}'`, function (err, result) {
+            this.#connection.query(`SELECT email,password FROM user_data where email = ${this.#connection.escape(email)}`, function (err, result) {
                 if(err){
                 console.log(err);
                 resolve(false);
@@ -41,7 +41,7 @@ class MainDao{
     //패스워드 솔트 요청
     async requestPasswordsalt(email){
         return new Promise((resolve) => {
-            this.#connection.query(`SELECT password_salt FROM user_data where email = '${connection.escape(email)}'`, async function (err, result) {
+            this.#connection.query(`SELECT password_salt FROM user_data where email = ${this.#connection.escape(email)}`, async function (err, result) {
                 if(err){
                 console.log(err);
                 resolve(false);
@@ -61,7 +61,7 @@ class MainDao{
         }
         const hashPassword = await Crypto.hashPassword(password,passwordSalt);
         return new Promise((resolve) => {
-            this.#connection.query(`SELECT email FROM user_data where email = '${connection.escape(email)}' and password = '${connection.escape(hashPassword)}'`, function (err, result) {
+            this.#connection.query(`SELECT email FROM user_data where email = ${this.#connection.escape(email)} and password = ${this.#connection.escape(hashPassword)}`, function (err, result) {
                 if(err){
                     console.log(err);
                     resolve(false);
@@ -78,7 +78,7 @@ class MainDao{
         const passwordSalt = await Crypto.createSalt();
         const hashPassword = await Crypto.hashPassword(password,passwordSalt);
         return new Promise((resolve) => {
-            this.#connection.query(`INSERT INTO user_data (email,password,password_salt) VALUES ('${connection.escape(email)}','${connection.escape(hashPassword)}','${connection.escape(passwordSalt)}')`,async function (err) {
+            this.#connection.query(`INSERT INTO user_data (email,password,password_salt) VALUES (${this.#connection.escape(email)},${this.#connection.escape(hashPassword)},${this.#connection.escape(passwordSalt)})`,async function (err) {
                 if (err) {
                     console.log(err)
                     resolve(false);
@@ -91,7 +91,7 @@ class MainDao{
     //이메일 중복 검사
     async checkEmailOverlap(email){
         return new Promise((resolve) => {
-            this.#connection.query(`SELECT email FROM user_data where email = '${connection.escape(email)}'`, function (err, result) {
+            this.#connection.query(`SELECT email FROM user_data where email = ${this.#connection.escape(email)}`, function (err, result) {
                 if(err){
                     console.log(err);
                     resolve(true);
@@ -106,7 +106,7 @@ class MainDao{
     //유정정보 삭제
     async deleteUserdata(email){
         return new Promise((resolve) => {
-            this.#connection.query(`UPDATE user_data SET is_deleted = 1 ,deleted_at = CURRENT_TIMESTAMP WHERE email = '${connection.escape(email)}'`, async function (err) {
+            this.#connection.query(`UPDATE user_data SET is_deleted = 1 ,deleted_at = CURRENT_TIMESTAMP WHERE email = ${this.#connection.escape(email)}`, async function (err) {
                 if (err) {
                     console.log(err);
                     resolve(false);
@@ -119,7 +119,7 @@ class MainDao{
     //유저정보 수정
     async changeUserdata(email,changeEmail){
         return new Promise((resolve) => {
-            this.#connection.query(`UPDATE user_data SET email = '${connection.escape(changeEmail)}' WHERE email = '${connection.escape(email)}'`, async function (err) {
+            this.#connection.query(`UPDATE user_data SET email = ${this.#connection.escape(changeEmail)} WHERE email = ${this.#connection.escape(email)}`, async function (err) {
                 if (err) {
                     this.#connection.end();
                     resolve(false);
@@ -135,7 +135,7 @@ class MainDao{
         const passwordSalt = await Crypto.createSalt();
         const hashPassword = await Crypto.hashPassword(password,passwordSalt);
         return new Promise((resolve) => {
-            this.#connection.query(`UPDATE user_data SET password = '${connection.escape(hashPassword)}' ,password_salt = '${connection.escape(passwordSalt)}' WHERE email = '${connection.escape(email)}'`, async function (err) {
+            this.#connection.query(`UPDATE user_data SET password = ${this.#connection.escape(hashPassword)} ,password_salt = ${this.#connection.escape(passwordSalt)} WHERE email = ${connection.escape(email)}`, async function (err) {
                 if (err) {
                     console.log(err);
                     resolve(false);
@@ -148,7 +148,7 @@ class MainDao{
     //삭제된 계정 체크
     async checkDeleted(email){
         return new Promise((resolve) => {
-            this.#connection.query(`SELECT is_deleted FROM user_data where email = '${connection.escape(email)}'`, function (err, result) {
+            this.#connection.query(`SELECT is_deleted FROM user_data where email = ${this.#connection.escape(email)}`, function (err, result) {
                 if(err){
                     console.log(err);
                     resolve(true);
