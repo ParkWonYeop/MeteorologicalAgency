@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userData">
+    <select id="getReferenceData">
+        SELECT
+            email,
+            password
+        From
+            user_data
+        WHERE
+            email = #{userEmail}
+    </select>
+    <select id="getPasswordSalt">
+        SELECT
+            password_salt
+        From
+            user_data
+        WHERE
+            email = #{userEmail}
+    </select>
+    <select id="login">
+        SELECT
+            email
+        From
+            user_data
+        WHERE
+            email = #{userEmail}
+        AND
+            password = #{userPassword}
+    </select>
+    <select id="checkDeleted">
+        SELECT
+            is_deleted
+        From
+            user_data
+        WHERE
+            email = #{userEmail}
+    </select>
+    <insert id="signup">
+        INSERT INTO
+            user_data(email,password,password_salt)
+        VALUSE
+            (#{userEmail},#{userPassword},#{passwordSalt})
+    </insert>
+    <update id="deleteUserdata">
+        UPDATE
+            user_data
+        SET
+            is_deleted = 1,
+            deleted_at = CURRENT_TIMESTAMP
+        WHERE
+            email = #{userEmail}
+    </update>
+    <update id="changeUserData">
+        UPDATE
+            user_data
+        SET
+            email = #{changeUserEmail}
+        WHERE
+            email = #{userEmail}
+    </update>
+    <update id="changePassword">
+        UPDATE
+            user_data
+        SET
+            password = #{changePassword},
+            password_salt = #{passwordSalt}
+        WHERE
+            email = #{userEmail}
+    </update>
+</mapper>

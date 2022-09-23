@@ -1,8 +1,7 @@
 //const mainDao = require(`../Dao/mainDao`);
 const {MainDao} = require(`../Dao/mainDao`);
 const logger = require(`../config/winston`);
-const passwordMaxlength = 5;
-const emailMaxlength = 5;
+const {maxLength} = require(`../config/etcConfig`);
 
 class UserService{
     #request;
@@ -70,11 +69,11 @@ class UserService{
             logger.error('signup not equal password');
             return this.#response.sendStatus(500)
         }
-        if(userPassword.length < passwordMaxlength){
+        if(userPassword.length < maxLength.password){
             logger.error('signup too short password');
             return this.#response.sendStatus(500)
         }
-        if(userEmail.length < emailMaxlength){
+        if(userEmail.length < maxLength.email){
             logger.error('signup too short email');
             return this.#response.sendStatus(500)
         }
@@ -105,7 +104,7 @@ class UserService{
             logger.error('changeUserdata changeEmail is undefined');
             return this.#response.sendStatus(500);
         }
-        if(this.#request.body.changeEmail < emailMaxlength){
+        if(this.#request.body.changeEmail < maxLength.email){
             logger.error('changeUserdata too short email');
             return this.#response.sendStatus(500);
         }
@@ -138,7 +137,7 @@ class UserService{
     //비밀번호 변경
     async changePassword(){
         const mainDao = new MainDao();
-        if(this.#request.body.changePassword < passwordMaxlength){
+        if(this.#request.body.changePassword < maxLength.password){
             logger.error('changePassword too short password');
             return this.#response.sendStatus(500).send(`비밀번호가 너무 짧습니다.`);
         }

@@ -1,4 +1,5 @@
 const {UserService} = require(`../services/userService`);
+const {UserService_mybatis} = require(`../services/userService_mybatis`);
 
 class UserController{
     #request;
@@ -12,19 +13,19 @@ class UserController{
 
     //유저정보 요청
     async referenceUserdata(){
-        const userService = new UserService(this.#request,this.#response);
+        const userService = new UserService_mybatis(this.#request,this.#response);
         await userService.referenceUserdata();
     }
 
     //로그인
     async login(){ 
-        const userService = new UserService(this.#request,this.#response);
+        const userService = new UserService_mybatis(this.#request,this.#response);
         await userService.login();
     }
 
     //회원가입
     async signup(){
-        const userService = new UserService(this.#request,this.#response);
+        const userService = new UserService_mybatis(this.#request,this.#response);
         await userService.signup();
     }
 
